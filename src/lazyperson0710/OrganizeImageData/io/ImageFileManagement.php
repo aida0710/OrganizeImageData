@@ -2,6 +2,8 @@
 
 namespace lazyperson0710\OrganizeImageData\io;
 
+use Error;
+
 class ImageFileManagement {
 
     private static ImageFileManagement $instance;
@@ -25,9 +27,8 @@ class ImageFileManagement {
         $list = $this->setFileList(self::ImageDirectory);
         $this->imageDirectoryList = $list;
         $count = count($list);
-        //var_dump($list);
         if ($count === 0) {
-            throw new \Error("imageフォルダに画像が存在しません");
+            throw new Error("imageフォルダに画像が存在しません");
         }
         return $count;
     }
@@ -79,7 +80,7 @@ class ImageFileManagement {
                 $count++;
             } elseif (rename($file, self::ImageDirectory . '/' . basename($file))) {
                 $count++;
-            } else throw new \Error("ファイルの移動に失敗しました");
+            } else throw new Error("ファイルの移動に失敗しました");
         }
         return $count;
     }

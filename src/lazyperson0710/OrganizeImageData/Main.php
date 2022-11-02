@@ -2,8 +2,6 @@
 
 namespace lazyperson0710\OrganizeImageData;
 
-
-
 class Main {
 
     public function __construct() {

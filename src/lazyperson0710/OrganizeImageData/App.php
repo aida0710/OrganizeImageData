@@ -2,7 +2,6 @@
 
 namespace lazyperson0710\OrganizeImageData;
 
-
 abstract class App {
 
     abstract public function execute();

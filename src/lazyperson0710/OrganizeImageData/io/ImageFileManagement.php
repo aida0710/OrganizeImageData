@@ -5,6 +5,7 @@ namespace lazyperson0710\OrganizeImageData\io;
 class ImageFileManagement {
 
     private static ImageFileManagement $instance;
+    public const ImageDirectory = '../../../Images';
     public array $imageDirectoryList = [];
 
     public const Extensions = [
@@ -14,15 +15,14 @@ class ImageFileManagement {
     ];
 
     public function checkImagesFolder(): void {
-        if (!is_dir('../../../Images')) {
-            throw new \Error("imageフォルダが存在しません");
+        if (!is_dir(self::ImageDirectory)) {
+            throw new Error("imageフォルダが存在しません");
         }
     }
 
-
     public function countImage(): int {
         $this->checkImagesFolder();
-        $list = $this->setFileList('../../../Images');
+        $list = $this->setFileList(self::ImageDirectory);
         $this->imageDirectoryList = $list;
         $count = count($list);
         //var_dump($list);
@@ -66,18 +66,18 @@ class ImageFileManagement {
         $list = $this->imageDirectoryList;
         $count = 0;
         foreach ($list as $file) {
-            if ($file === '../../../Images/' . basename($file)) {
+            if ($file === self::ImageDirectory . '/' . basename($file)) {
                 continue;
             }
-            if (is_file('../../../Images/' . basename($file))) {
+            if (is_file(self::ImageDirectory . '/' . basename($file))) {
                 $fileName = pathinfo($file, PATHINFO_FILENAME);
                 $extension = pathinfo($file, PATHINFO_EXTENSION);
                 $rename = $fileName . '_' . mt_rand(100000000, 999999999);
-                if (!rename($file, '../../../Images/' . $rename . "." . $extension)) {
-                    throw new \Error("ファイルの名前変更に失敗しました");
+                if (!rename($file, self::ImageDirectory . '/' . $rename . "." . $extension)) {
+                    throw new Error("ファイルの名前変更に失敗しました");
                 }
                 $count++;
-            } elseif (rename($file, '../../../Images/' . basename($file))) {
+            } elseif (rename($file, self::ImageDirectory . '/' . basename($file))) {
                 $count++;
             } else throw new \Error("ファイルの移動に失敗しました");
         }
@@ -85,14 +85,14 @@ class ImageFileManagement {
     }
 
     public function emptyDirectoryDelete(): void {
-        $files = glob(rtrim('../../../Images/', '/') . '/*', GLOB_BRACE);
+        $files = glob(rtrim(self::ImageDirectory . '/', '/') . '/*', GLOB_BRACE);
         foreach ($files as $file) {
             if (is_dir($file)) {
                 var_dump($file);
                 array_map('unlink', $files);
             }
         }
-        $list = $this->setFileList('../../../Images');
+        $list = $this->setFileList(self::ImageDirectory);
         $this->imageDirectoryList = $list;
     }
 

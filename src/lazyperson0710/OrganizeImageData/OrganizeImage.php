@@ -2,15 +2,13 @@
 
 namespace lazyperson0710\OrganizeImageData;
 
+use Error;
 use lazyperson0710\OrganizeImageData\io\ImageFileManagement;
 
 require_once "./App.php";
 require_once "./io/ImageFileManagement.php";
 
 class OrganizeImage extends App {
-
-    public const ImageDirectory = '../../../Images';
-    private array $imageDirectoryList = [];
 
     /**
      * imageフォルダの中身を確認する
@@ -70,7 +68,7 @@ class OrganizeImage extends App {
                     return "no";
                 }
             default:
-                throw new \Error("typeが不正です");
+                throw new Error("typeが不正です");
         }
     }
 

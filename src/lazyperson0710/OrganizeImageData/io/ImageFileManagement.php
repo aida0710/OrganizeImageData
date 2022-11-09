@@ -10,12 +10,6 @@ class ImageFileManagement {
     public const ImageDirectory = '../../../Images';
     public array $imageDirectoryList = [];
 
-    public const Extensions = [
-        'jpg',
-        'jpeg',
-        'png',
-    ];
-
     public function checkImagesFolder(): void {
         if (!is_dir(self::ImageDirectory)) {
             throw new Error("imageフォルダが存在しません");
@@ -33,33 +27,49 @@ class ImageFileManagement {
         return $count;
     }
 
-    public function setFileList($dir): array {
+    public function setFileList($dir, ?bool $getDate = false): array {
         $files = glob(rtrim($dir, '/') . '/*');
         $list = [];
         foreach ($files as $file) {
             if (is_file($file)) {
-                $list[] = $file;
+                if ($getDate) {
+                    if (exif_read_data($file) === false) {
+                        var_dump("false判定くらったー！！！！");
+                        $list[] = [
+                            'file' => $file,
+                            'date' => false,
+                        ];
+                    } elseif (isset(exif_read_data($file)['DateTimeOriginal'])) {
+                        $exifDatePattern = '/\A(?<year>\d{4}):(?<month>\d{2}):(?<day>\d{2}) (?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})\z/';
+                        if (preg_match($exifDatePattern, exif_read_data($file)['DateTimeOriginal'], $matches)) {
+                            $dateTime = sprintf('%d%d%d%d%d%d',
+                                $matches['year'],
+                                $matches['month'],
+                                $matches['day'],
+                                $matches['hour'],
+                                $matches['minute'],
+                                $matches['second'],
+                            );
+                        } else throw new Error("日付の取得に失敗しました");
+                        $list[] = [
+                            'file' => $file,
+                            'date' => $dateTime,
+                        ];
+                    } else {
+                        $list[] = [
+                            'file' => $file,
+                            'date' => false,
+                        ];
+                    }
+                } else {
+                    $list[] = $file;
+                }
             }
             if (is_dir($file)) {
                 $list = array_merge($list, $this->setFileList($file));
             }
         }
         return $list;
-    }
-
-    public function deleteOtherFile(): int {
-        $this->checkImagesFolder();
-        $list = $this->imageDirectoryList;
-        $count = 0;
-        foreach ($list as $key => $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (!in_array(mb_strtolower($extension), self::Extensions)) {
-                unlink($file);
-                unset($this->imageDirectoryList[$key]);
-                $count++;
-            }
-        }
-        return $count;
     }
 
     public function moveFile(): int {
